@@ -1,15 +1,15 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
 
 module.exports = {
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js'
+    publicPath: "auto"
   },
   devServer: {
     static: path.resolve(__dirname, 'src'),
-    port: 3010,
+    port: 8002,
     open: true,
     hot: true
   },
@@ -33,6 +33,23 @@ module.exports = {
     ]
   },
   plugins: [
+    new ModuleFederationPlugin({
+      name: 'remote2',
+      filename: "remoteEntry.js",
+      shared: {
+        "react": {
+          singleton: true,
+          requiredVersion: false,
+        },
+        "react-dom": {
+          singleton: true,
+          requiredVersion: false,
+        }
+      },
+      exposes: {
+        "./Remote2": "./src/Remote2.js"
+      }
+    }),
     new HtmlWebpackPlugin({
       template: 'src/index.html'
     }),
